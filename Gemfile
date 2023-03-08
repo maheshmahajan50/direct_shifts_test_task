@@ -50,6 +50,7 @@ gem "bootsnap", require: false
 
 # Authentication system for users
 gem 'devise'
+gem 'devise_token_auth'
 
 gem 'byebug'
 
