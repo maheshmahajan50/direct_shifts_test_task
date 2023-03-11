@@ -19,7 +19,7 @@ class ReferralsController < ApplicationController
   private
 
   def send_referral_mail
-    ReferralMailer.with(email: params[:email], invite_link: invite_link, current_user: current_user).referral_email.deliver_now
+    ReferralMailer.with(email: params[:referral][:email], invite_link: invite_link, current_user: current_user).referral_email.deliver_now
   end
 
   def invite_link
