@@ -26,10 +26,9 @@ const App = () => {
               <Route path="/" element={<LoginForm setToken={setToken} />} />
             )}
             <Route
-              path="/sign_in"
-              element={<LoginForm setToken={setToken} />}
+              path="/sign_up"
+              element={<SignupForm setToken={setToken} />}
             />
-            <Route path="/sign_up" element={<SignupForm />} />
           </Routes>
         </BrowserRouter>
       </div>

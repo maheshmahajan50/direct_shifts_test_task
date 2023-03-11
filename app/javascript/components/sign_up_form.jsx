@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextField, Button, makeStyles } from "@material-ui/core";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -17,35 +18,53 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SignUpForm = () => {
+const SignUpForm = ({ setToken }) => {
   const classes = useStyles();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem("access-token")) {
+      navigate("/");
+    }
+  }, []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    fetch("/users", {
+    let params = new URL(document.location).searchParams;
+    let referral_id = params.get("referral_id");
+    fetch("/auth", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
       body: JSON.stringify({
-        user: {
-          first_name: firstName,
-          last_name: lastName,
-          email: email,
-          password: password,
-          password_confirmation: passwordConfirmation,
-        },
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        referral_id: referral_id,
+        password: password,
+        password_confirmation: passwordConfirmation,
       }),
     }).then((response) => {
       if (response.ok) {
+        for (let entry of response.headers.entries()) {
+          if (entry[0] === "access-token") {
+            localStorage.setItem("access-token", entry[1]);
+            setToken(entry[1]);
+          }
+          if (entry[0] === "client") {
+            localStorage.setItem("client", entry[1]);
+          }
+        }
+        navigate("/");
       } else {
-        // Handle failed login
+        // Handle failed Signup
       }
     });
   };
@@ -98,7 +117,7 @@ const SignUpForm = () => {
         variant="contained"
         color="primary"
       >
-        Login
+        Sign Up
       </Button>
     </form>
   );
