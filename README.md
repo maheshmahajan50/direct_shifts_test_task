@@ -1,24 +1,18 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+- Ruby version
+  3.0.1
 
-Things you may want to cover:
+- Rails version
+  7.0.4.2
 
-* Ruby version
+* Using mysql as database
 
-* System dependencies
+To setup the project run `bin/setup`
+It install all the dependencies and configure database.
 
-* Configuration
+To run server `bin/dev`
+You can hit `localhost:3000` to check application
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Configured letter_opener in development to check emails
+We can open it by hitting `localhost:3000/letter_opener`
