@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Button, makeStyles } from "@material-ui/core";
+import {
+  TextField,
+  Button,
+  makeStyles,
+  FormHelperText,
+} from "@material-ui/core";
 import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
@@ -25,6 +30,7 @@ const SignUpForm = ({ setToken }) => {
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,44 +39,56 @@ const SignUpForm = ({ setToken }) => {
     }
   }, []);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     let params = new URL(document.location).searchParams;
     let referral_id = params.get("referral_id");
-    fetch("/auth", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        first_name: firstName,
-        last_name: lastName,
-        email: email,
-        referral_id: referral_id,
-        password: password,
-        password_confirmation: passwordConfirmation,
-      }),
-    }).then((response) => {
+    try {
+      const response = await fetch("/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          referral_id: referral_id,
+          password: password,
+          password_confirmation: passwordConfirmation,
+        }),
+      });
+
       if (response.ok) {
         for (let entry of response.headers.entries()) {
-          if (entry[0] === "access-token") {
-            localStorage.setItem("access-token", entry[1]);
-            setToken(entry[1]);
-          }
-          if (entry[0] === "client") {
-            localStorage.setItem("client", entry[1]);
+          for (let entry of response.headers.entries()) {
+            if (
+              entry[0] === "access-token" ||
+              entry[0] === "client" ||
+              entry[0] === "uid"
+            ) {
+              localStorage.setItem(entry[0], entry[1]);
+              if (entry[0] === "access-token") {
+                setToken(entry[1]);
+              }
+            }
           }
         }
         navigate("/");
       } else {
-        // Handle failed Signup
+        return response.json().then((json) => {
+          setError(json.errors.full_messages);
+        });
       }
-    });
+    } catch (error) {}
   };
 
   return (
     <form className={classes.form} onSubmit={handleSubmit}>
+      <br />
+      {error && <FormHelperText error>{error}</FormHelperText>}
+      <br />
       <TextField
         className={classes.textField}
         label="First Name"
