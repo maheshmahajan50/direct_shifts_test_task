@@ -21,7 +21,10 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             {token ? (
-              <Route path="/" element={<Dashboard />} />
+              <Route
+                path="/"
+                element={<Dashboard setToken={setToken} token={token} />}
+              />
             ) : (
               <Route path="/" element={<LoginForm setToken={setToken} />} />
             )}

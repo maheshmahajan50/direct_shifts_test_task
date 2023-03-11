@@ -1,12 +1,16 @@
 class ReferralsController < ApplicationController
+  before_action :authenticate_user!
+
   def index
     @referrals = current_user.referrals
+    render json: {referrals: @referrals}
   end
 
   def create
     @referral = Referral.new(referral_params)
     if @referral.save
-      render json: {status: 200, message: "Referral email sent successfully."} 
+      send_referral_mail
+      render json: {status: 200, message: "Referral email sent successfully.", referral: @referral} 
     else
       render json: { errors: @referral.errors }
     end
@@ -23,6 +27,6 @@ class ReferralsController < ApplicationController
   end
 
   def referral_params
-    params.require(:referral).permit(:email, :user_id)
+    params.require(:referral).permit(:email).merge!(user_id: current_user.id)
   end
 end

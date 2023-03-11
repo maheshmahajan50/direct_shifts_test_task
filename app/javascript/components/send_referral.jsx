@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextField, Button, makeStyles } from "@material-ui/core";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -17,37 +18,42 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LoginForm = ({ setToken }) => {
+const SendReferral = ({ setCheckReferral }) => {
   const classes = useStyles();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = async (event) => {
+  useEffect(() => {
+    if (localStorage.getItem("access-token")) {
+      navigate("/");
+    }
+  }, []);
+
+  const handleSubmit = (event) => {
     event.preventDefault();
-    await fetch("/auth/sign_in", {
+
+    fetch("/referrals", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        "access-token": localStorage.getItem("access-token"),
+        client: localStorage.getItem("client"),
+        uid: localStorage.getItem("uid"),
       },
       body: JSON.stringify({
-        email: email,
-        password: password,
+        referral: {
+          email: email,
+        },
       }),
     }).then((response) => {
       if (response.ok) {
-        for (let entry of response.headers.entries()) {
-          if (
-            entry[0] === "access-token" ||
-            entry[0] === "client" ||
-            entry[0] === "uid"
-          ) {
-            localStorage.setItem(entry[0], entry[1]);
-            setToken(entry[1]);
-          }
-        }
+        return response.json().then((json) => {
+          setCheckReferral(json.referral);
+          setEmail("");
+        });
       } else {
-        // Handle failed login
+        // Handle failed Signup
       }
     });
   };
@@ -62,24 +68,16 @@ const LoginForm = ({ setToken }) => {
         onChange={(event) => setEmail(event.target.value)}
         required
       />
-      <TextField
-        className={classes.textField}
-        label="Password"
-        type="password"
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
-        required
-      />
       <Button
         className={classes.button}
         type="submit"
         variant="contained"
         color="primary"
       >
-        Login
+        Send Invite
       </Button>
     </form>
   );
 };
 
-export default LoginForm;
+export default SendReferral;
