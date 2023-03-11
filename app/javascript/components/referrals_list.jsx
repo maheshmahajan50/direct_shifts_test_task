@@ -18,15 +18,17 @@ const useStyles = makeStyles((theme) => ({
 const ReferralsList = ({ checkReferral, token }) => {
   const classes = useStyles();
   const [referrals, setReferrals] = useState([]);
+  const [client, setClient] = useState(null);
+  const [uid, setUid] = useState(null);
   const access_token = localStorage.getItem("access-token");
-  const client = localStorage.getItem("client");
-  const uid = localStorage.getItem("uid");
 
   useEffect(() => {
-    if (token) {
+    !client && setClient(localStorage.getItem("client"));
+    !uid && setUid(localStorage.getItem("uid"));
+    if (token && client && uid) {
       fetchReferrals();
     }
-  }, [checkReferral, token]);
+  }, [checkReferral, client, uid]);
 
   const fetchReferrals = async () => {
     await fetch("/referrals", {

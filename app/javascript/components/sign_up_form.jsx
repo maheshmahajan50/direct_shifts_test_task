@@ -137,6 +137,14 @@ const SignUpForm = ({ setToken }) => {
       >
         Sign Up
       </Button>
+      <Button
+        onClick={() => {
+          navigate("/");
+        }}
+      >
+        {" "}
+        Sign In
+      </Button>
     </form>
   );
 };

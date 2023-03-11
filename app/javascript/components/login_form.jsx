@@ -5,6 +5,7 @@ import {
   makeStyles,
   FormHelperText,
 } from "@material-ui/core";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -27,6 +28,7 @@ const LoginForm = ({ setToken }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -93,6 +95,14 @@ const LoginForm = ({ setToken }) => {
         color="primary"
       >
         Login
+      </Button>
+      <Button
+        onClick={() => {
+          navigate("/sign_up");
+        }}
+      >
+        {" "}
+        Sign Up
       </Button>
     </form>
   );
